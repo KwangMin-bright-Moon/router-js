@@ -8,4 +8,12 @@ export default class Router {
     about: () => this.mainPage.innerText('about'),
     content: () => this.mainPage.innerText('content'),
   };
+
+  addRouter = (hashFragment, component) => {
+    this.#routers({ hashFragment, component });
+  };
+
+  setNotFound = (notFound) => {
+    this.addRouter('#/NotFound', notFound);
+  };
 }
