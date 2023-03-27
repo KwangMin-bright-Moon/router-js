@@ -1,8 +1,8 @@
 export default class Router {
   #routers = [];
 
-  addRouter = (hashFragment, component) => {
-    this.#routers.push({ hashFragment, component });
+  addRouter = (hash, component) => {
+    this.#routers.push({ hash, component });
   };
 
   setNotFound = (notFound) => {
@@ -16,14 +16,14 @@ export default class Router {
 
   renderNotFoundComponet = () => {
     const notFoundRouter = this.#routers.find(
-      (router) => router.hashFragment === '#/NotFound'
+      (router) => router.hash === '#/NotFound'
     );
     notFoundRouter.component();
   };
 
   renderComponetByhash = () => {
     const currentRouter = this.#routers.find(
-      (router) => router.hashFragment === window.location.hash
+      (router) => router.hash === window.location.hash
     );
 
     currentRouter ? currentRouter.component() : this.renderNotFoundComponet();
