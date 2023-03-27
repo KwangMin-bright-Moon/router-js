@@ -1,19 +1,31 @@
 export default class Router {
   #routers = [];
 
-  mainPage = document.querySelector('main');
-
-  #pages = {
-    home: () => this.mainPage.innerText('Home'),
-    about: () => this.mainPage.innerText('about'),
-    content: () => this.mainPage.innerText('content'),
-  };
-
   addRouter = (hashFragment, component) => {
-    this.#routers({ hashFragment, component });
+    this.#routers.push({ hashFragment, component });
   };
 
   setNotFound = (notFound) => {
     this.addRouter('#/NotFound', notFound);
+  };
+
+  start = () => {
+    window.addEventListener('hashchange', this.renderComponetByhash);
+    this.renderComponetByhash();
+  };
+
+  renderNotFoundComponet = () => {
+    const notFoundRouter = this.#routers.find(
+      (router) => router.hashFragment === '#/NotFound'
+    );
+    notFoundRouter.component();
+  };
+
+  renderComponetByhash = () => {
+    const currentRouter = this.#routers.find(
+      (router) => router.hashFragment === window.location.hash
+    );
+
+    currentRouter ? currentRouter.component() : this.renderNotFoundComponet();
   };
 }
