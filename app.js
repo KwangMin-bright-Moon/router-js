@@ -11,7 +11,7 @@ const components = {
 
 const router = new Router();
 
-router.addRouter('#/', components.home);
-router.addRouter('#/about', components.about);
+router.addRouter('/', components.home);
+router.addRouter('/about', components.about);
 router.setNotFound(components.notFound);
 router.start();
