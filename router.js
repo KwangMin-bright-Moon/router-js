@@ -27,11 +27,12 @@ export default class Router {
   };
 
   renderComponent = () => {
-    const currentRouter = this.#routers.find(
-      (router) => router.path === window.location.pathname
-    );
+    const routersWithParam = this.findRouterWithParam();
+    const param = routersWithParam?.params[1] ?? null;
 
-    currentRouter ? currentRouter.component() : this.renderNotFoundComponet();
+    routersWithParam
+      ? routersWithParam.router.component(param)
+      : this.renderNotFoundComponet();
   };
 
   handleOnClickLink = () => {
@@ -46,5 +47,23 @@ export default class Router {
 
   backOrForwardPage = () => {
     window.addEventListener('popstate', this.renderComponent);
+  };
+
+  pathToRegex = (path) =>
+    new RegExp('^' + path.replace(/\//g, '\\/').replace(/:\w+/g, '(.+)') + '$');
+
+  findRouterWithParam = () => {
+    const routersWithParams = this.#routers.map((router) => {
+      return {
+        router,
+        params: location.pathname.match(this.pathToRegex(router.path)),
+      };
+    });
+
+    const routersWithParam = routersWithParams.find(
+      (router) => router.params !== null
+    );
+
+    return routersWithParam;
   };
 }
