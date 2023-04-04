@@ -10,7 +10,7 @@ export default class Router {
   };
 
   start = () => {
-    this.navigateHistoryPage();
+    this.backOrForwardPage();
 
     window.addEventListener('DOMContentLoaded', () => {
       this.handleOnClickLink();
@@ -44,7 +44,7 @@ export default class Router {
     });
   };
 
-  navigateHistoryPage = () => {
+  backOrForwardPage = () => {
     window.addEventListener('popstate', this.renderComponent);
   };
 }
