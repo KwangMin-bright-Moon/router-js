@@ -19,20 +19,8 @@ export default class Router {
     this.renderComponent();
   };
 
-  renderNotFoundComponet = () => {
-    const notFoundRouter = this.#routers.find(
-      (router) => router.path === '/NotFound'
-    );
-    notFoundRouter.component();
-  };
-
-  renderComponent = () => {
-    const routersWithParam = this.findRouterWithParam();
-    const param = routersWithParam?.params[1] ?? null;
-
-    routersWithParam
-      ? routersWithParam.router.component(param)
-      : this.renderNotFoundComponet();
+  backOrForwardPage = () => {
+    window.addEventListener('popstate', this.renderComponent);
   };
 
   handleOnClickLink = () => {
@@ -45,12 +33,21 @@ export default class Router {
     });
   };
 
-  backOrForwardPage = () => {
-    window.addEventListener('popstate', this.renderComponent);
+  renderComponent = () => {
+    const routersWithParam = this.findRouterWithParam();
+    const param = routersWithParam?.params[1] ?? null;
+
+    routersWithParam
+      ? routersWithParam.router.component(param)
+      : this.renderNotFoundComponet();
   };
 
-  pathToRegex = (path) =>
-    new RegExp('^' + path.replace(/\//g, '\\/').replace(/:\w+/g, '(.+)') + '$');
+  renderNotFoundComponet = () => {
+    const notFoundRouter = this.#routers.find(
+      (router) => router.path === '/NotFound'
+    );
+    notFoundRouter.component();
+  };
 
   findRouterWithParam = () => {
     const routersWithParams = this.#routers.map((router) => {
@@ -66,4 +63,7 @@ export default class Router {
 
     return routersWithParam;
   };
+
+  pathToRegex = (path) =>
+    new RegExp('^' + path.replace(/\//g, '\\/').replace(/:\w+/g, '(.+)') + '$');
 }
