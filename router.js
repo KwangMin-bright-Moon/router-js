@@ -10,6 +10,8 @@ export default class Router {
   };
 
   start = () => {
+    this.navigateHistoryPage();
+
     window.addEventListener('DOMContentLoaded', () => {
       this.handleOnClickLink();
     });
@@ -40,5 +42,9 @@ export default class Router {
         this.renderComponent();
       }
     });
+  };
+
+  navigateHistoryPage = () => {
+    window.addEventListener('popstate', this.renderComponent);
   };
 }
