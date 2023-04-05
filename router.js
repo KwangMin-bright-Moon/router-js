@@ -1,8 +1,8 @@
 export default class Router {
-  #routers = [];
+  #routes = [];
 
   addRouter = (path, component) => {
-    this.#routers.push({ path, component });
+    this.#routes.push({ path, component });
   };
 
   setNotFound = (notFound) => {
@@ -10,7 +10,7 @@ export default class Router {
   };
 
   start = () => {
-    this.backOrForwardPage();
+    window.addEventListener('popstate', this.renderComponent);
 
     window.addEventListener('DOMContentLoaded', () => {
       this.handleOnClickLink();
@@ -19,17 +19,15 @@ export default class Router {
     this.renderComponent();
   };
 
-  backOrForwardPage = () => {
-    window.addEventListener('popstate', this.renderComponent);
-  };
-
   handleOnClickLink = () => {
     document.body.addEventListener('click', (e) => {
-      if (e.target.matches('[data-link]')) {
-        e.preventDefault();
-        history.pushState(null, null, e.target.href);
-        this.renderComponent();
+      if (!e.target.closest('[data-link]')) {
+        return;
       }
+
+      e.preventDefault();
+      history.pushState(null, null, e.target.href);
+      this.renderComponent();
     });
   };
 
@@ -43,14 +41,14 @@ export default class Router {
   };
 
   renderNotFoundComponet = () => {
-    const notFoundRouter = this.#routers.find(
+    const notFoundRouter = this.#routes.find(
       (router) => router.path === '/NotFound'
     );
     notFoundRouter.component();
   };
 
   findRouterWithParam = () => {
-    const routersWithParams = this.#routers.map((router) => {
+    const routersWithParams = this.#routes.map((router) => {
       return {
         router,
         params: location.pathname.match(this.pathToRegex(router.path)),
