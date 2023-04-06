@@ -12,8 +12,9 @@ const components = {
 
 const router = new Router();
 
-router.addRouter('/', components.home);
-router.addRouter('/about', components.about);
-router.addRouter('/content/:id', components.contentDetail);
-router.setNotFound(components.notFound);
-router.start();
+router
+  .addRouter('/', components.home)
+  .addRouter('/about', components.about)
+  .addRouter('/content/:id', components.contentDetail)
+  .setNotFound(components.notFound)
+  .start();

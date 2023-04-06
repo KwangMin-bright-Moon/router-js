@@ -3,10 +3,12 @@ export default class Router {
 
   addRouter = (path, component) => {
     this.#routes.push({ path, component });
+    return this;
   };
 
   setNotFound = (notFound) => {
     this.addRouter('/NotFound', notFound);
+    return this;
   };
 
   start = () => {
@@ -32,34 +34,37 @@ export default class Router {
   };
 
   renderComponent = () => {
-    const routersWithParam = this.findRouterWithParam();
-    const param = routersWithParam?.params[1] ?? null;
+    const matchRoute = this.getMatchRoutes();
+    const param = matchRoute?.params[1] ?? null;
 
-    routersWithParam
-      ? routersWithParam.router.component(param)
+    matchRoute
+      ? matchRoute.route.component(param)
       : this.renderNotFoundComponet();
   };
 
   renderNotFoundComponet = () => {
     const notFoundRouter = this.#routes.find(
-      (router) => router.path === '/NotFound'
+      (route) => route.path === '/NotFound'
     );
+
+    if (!notFoundRouter) {
+      document.querySelector('main').innerHTML = 'NotFound';
+    }
+
     notFoundRouter.component();
   };
 
-  findRouterWithParam = () => {
-    const routersWithParams = this.#routes.map((router) => {
+  getMatchRoutes = () => {
+    const matchRoutes = this.#routes.map((route) => {
       return {
-        router,
-        params: location.pathname.match(this.pathToRegex(router.path)),
+        route,
+        params: location.pathname.match(this.pathToRegex(route.path)),
       };
     });
 
-    const routersWithParam = routersWithParams.find(
-      (router) => router.params !== null
-    );
+    const matchRoute = matchRoutes.find((route) => route.params !== null);
 
-    return routersWithParam;
+    return matchRoute;
   };
 
   pathToRegex = (path) =>
