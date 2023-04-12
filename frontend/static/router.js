@@ -12,61 +12,99 @@ export default class Router {
   };
 
   start = () => {
-    window.addEventListener('popstate', this.renderComponent);
+    window.addEventListener('popstate', this.render);
 
     window.addEventListener('DOMContentLoaded', () => {
-      this.handleOnClickLink();
+      this.handleClickLink();
     });
 
-    this.renderComponent();
+    this.render();
   };
 
-  handleOnClickLink = () => {
+  handleClickLink = () => {
     document.body.addEventListener('click', (e) => {
       if (!e.target.closest('[data-link]')) {
         return;
       }
 
       e.preventDefault();
+
       history.pushState(null, null, e.target.href);
-      this.renderComponent();
+
+      this.render();
     });
   };
 
-  renderComponent = () => {
-    const matchRoute = this.getMatchRoutes();
-    const param = matchRoute?.params[1] ?? null;
+  render = () => {
+    const matchRoute = this.getMatchRoute();
 
-    matchRoute
-      ? matchRoute.route.component(param)
-      : this.renderNotFoundComponet();
+    const param = this.getParam(matchRoute);
+
+    matchRoute ? matchRoute.component(param) : this.renderNotFound();
   };
 
-  renderNotFoundComponet = () => {
+  renderNotFound = () => {
     const notFoundRouter = this.#routes.find(
       (route) => route.path === '/NotFound'
     );
 
     if (!notFoundRouter) {
-      document.querySelector('main').innerHTML = 'NotFound';
+      return (document.querySelector('main').innerHTML = 'NotFound');
     }
 
     notFoundRouter.component();
   };
 
-  getMatchRoutes = () => {
-    const matchRoutes = this.#routes.map((route) => {
-      return {
-        route,
-        params: location.pathname.match(this.pathToRegex(route.path)),
-      };
-    });
+  getMatchRoute = () => {
+    const currentPath = location.pathname;
 
-    const matchRoute = matchRoutes.find((route) => route.params !== null);
+    const matchRoute = this.#routes.find((route) => {
+      if (this.isMatchedRoute(route.path, currentPath)) {
+        return true;
+      }
+      return false;
+    });
 
     return matchRoute;
   };
 
-  pathToRegex = (path) =>
-    new RegExp('^' + path.replace(/\//g, '\\/').replace(/:\w+/g, '(.+)') + '$');
+  isMatchedRoute(path, currentPath) {
+    if (path.split('/')[1] === currentPath.split('/')[1]) {
+      return true;
+    }
+
+    false;
+  }
+
+  getParam = (route) => {
+    const paramKeys = this.getParamKeys(route.path);
+
+    if (paramKeys.length) {
+      const currentPaths = location.pathname.split('/');
+
+      const currentParams = [];
+
+      paramKeys.forEach((paramKeys) => {
+        currentParams.push({ [paramKeys.key]: currentPaths[paramKeys.index] });
+      });
+
+      return currentParams;
+    }
+
+    return null;
+  };
+
+  getParamKeys = (path) => {
+    const paths = path.split('/');
+
+    const paramKeys = [];
+
+    paths.forEach((path, index) => {
+      if (path.startsWith(':')) {
+        paramKeys.push({ key: path.slice(1), index });
+      }
+    });
+
+    return paramKeys;
+  };
 }
